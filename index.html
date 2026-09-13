@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Ubiquities — 3D Scanning & Spatial Capture</title>
+<meta name="description" content="Object, interior, and site capture in Los Angeles — LiDAR, photogrammetry, structured light, and aerial — delivered as clean point clouds, meshes, and XR-ready assets.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #E9ECEF;        /* viewer grey */
+    --surface: #F7F8F9;
+    --ink: #17222C;
+    --ink-2: #4E5A66;
+    --line: #C9CFD6;
+    --line-strong: #17222C;
+    --accent: #E85D04;    /* survey orange */
+    --accent-ink: #FFFFFF;
+    --max: 1120px;
+    --gutter: clamp(20px, 4vw, 48px);
+    --radius: 3px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "Instrument Sans", system-ui, -apple-system, Segoe UI, sans-serif;
+    font-size: 17px; line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  img, iframe { max-width: 100%; display: block; }
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
+  h1, h2, h3 { margin: 0; font-weight: 600; letter-spacing: -0.015em; line-height: 1.1; }
+  h1 { font-size: clamp(38px, 6vw, 68px); letter-spacing: -0.03em; }
+  h2 { font-size: clamp(28px, 3.6vw, 40px); max-width: 22ch; }
+  h3 { font-size: 20px; line-height: 1.3; }
+  p { margin: 0; }
+  p + p { margin-top: 1em; }
+  .lede { font-size: 19px; color: var(--ink-2); max-width: 58ch; }
+  .eyebrow { font-size: 15px; color: var(--ink-2); margin-bottom: 14px; }
+  section { padding: clamp(64px, 9vw, 120px) 0; border-top: 1px solid var(--line); }
+  .section-head { display: grid; gap: 16px; margin-bottom: clamp(32px, 5vw, 56px); }
+  .section-head .lede { max-width: 52ch; }
+  ul { margin: 0; padding: 0; list-style: none; }
+
+  /* nav */
+  header { position: sticky; top: 0; z-index: 10; background: rgba(233,236,239,.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+  .nav { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 24px; }
+  .brand { text-decoration: none; font-weight: 600; font-size: 15px; display: flex; align-items: center; gap: 10px; }
+  .brand span { color: var(--ink-2); font-weight: 400; }
+  .brand::before { content: ""; width: 10px; height: 10px; background: var(--accent); border-radius: 50%; }
+  .nav ul { display: flex; gap: 22px; font-size: 15px; }
+  .nav a:not(.brand) { text-decoration: none; color: var(--ink-2); }
+  .nav a:not(.brand):hover { color: var(--ink); }
+  .nav .sibling { border-left: 1px solid var(--line); padding-left: 22px; }
+  @media (max-width: 760px) { .nav ul li:not(.sibling):not(:last-child) { display: none; } }
+
+  /* buttons */
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: var(--radius); text-decoration: none; font-weight: 500; font-size: 16px; border: 1px solid var(--line-strong); background: transparent; color: var(--ink); cursor: pointer; font-family: inherit; }
+  .btn.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .btn.primary:hover { background: var(--accent); border-color: var(--accent); }
+  .btn:hover { border-color: var(--accent); }
+  .btn-row { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  /* hero */
+  .hero { border-top: 0; padding-top: clamp(48px, 7vw, 96px); }
+  .hero-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: clamp(32px, 5vw, 64px); align-items: center; }
+  @media (max-width: 900px) { .hero-grid { grid-template-columns: 1fr; } }
+  .hero h1 { max-width: 12ch; }
+  .hero .lede { margin: 24px 0 32px; }
+  .proofs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px; font-size: 14px; color: var(--ink-2); }
+  @media (max-width: 520px) { .proofs { grid-template-columns: 1fr; } }
+  .proofs strong { display: block; color: var(--ink); font-weight: 600; }
+
+  /* embedded scan viewer */
+  .viewer { position: relative; background: #D5DADF; border: 1px solid var(--line); border-radius: var(--radius); aspect-ratio: 4 / 3; overflow: hidden; }
+  .viewer iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .viewer .poster { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; cursor: pointer; border: 0; background:
+      linear-gradient(var(--line) 1px, transparent 1px) 0 0 / 24px 24px,
+      linear-gradient(90deg, var(--line) 1px, transparent 1px) 0 0 / 24px 24px, #D5DADF;
+    color: var(--ink); font-family: inherit; }
+  .viewer .poster .dot { width: 56px; height: 56px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; color: #fff; }
+  .viewer .poster .dot svg { width: 22px; height: 22px; }
+  .viewer .poster small { font-size: 14px; color: var(--ink-2); }
+  .viewer .poster:hover .dot { transform: scale(1.06); }
+  .viewer.is-loaded .poster { display: none; }
+  .viewer-cap { display: flex; justify-content: space-between; gap: 16px; font-size: 14px; color: var(--ink-2); margin-top: 10px; }
+  .viewer-cap b { color: var(--ink); font-weight: 500; }
+
+  /* scale ruler — the one loud element */
+  .ruler-wrap { border-top: 1px solid var(--line); padding: clamp(40px, 6vw, 72px) 0; }
+  .ruler { position: relative; padding-top: 26px; }
+  .ruler .track { height: 2px; background: var(--line-strong); position: relative; }
+  .ruler .track::before { content: ""; position: absolute; left: 0; right: 0; top: -9px; height: 20px;
+    background-image: repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px 100%);
+    background-size: 5% 100%; opacity: .45; }
+  .ruler .marks { display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-2); margin-top: 12px; }
+  .tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 36px; }
+  @media (max-width: 760px) { .tiers { grid-template-columns: 1fr; } }
+  .tier { padding-top: 18px; }
+  .pin { position: absolute; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: var(--accent); border: 3px solid var(--bg); box-shadow: 0 0 0 1px var(--ink); }
+  .pin:nth-child(1) { left: 0; margin-left: 0; }
+  .pin:nth-child(2) { left: calc((100% - 40px) / 3 + 20px); }
+  .pin:nth-child(3) { left: calc(((100% - 40px) / 3 + 20px) * 2); }
+  @media (max-width: 760px) { .pin { display: none; } }
+  .tier h3 { font-size: 22px; }
+  .tier .range { font-size: 15px; color: var(--accent); font-weight: 600; margin: 4px 0 8px; }
+  .tier p { color: var(--ink-2); font-size: 16px; }
+
+  /* cards, shared */
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  @media (max-width: 900px) { .cards { grid-template-columns: 1fr; } }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; display: flex; flex-direction: column; gap: 14px; }
+  .card p { color: var(--ink-2); }
+  .card ul { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--line); font-size: 15px; display: grid; gap: 6px; }
+  .card ul li::before { content: "—"; color: var(--accent); margin-right: 8px; }
+
+  /* formats */
+  .formats { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+  .formats li { border: 1px solid var(--line-strong); border-radius: 999px; padding: 6px 14px; font-size: 15px; font-weight: 500; }
+  .formats li span { color: var(--ink-2); font-weight: 400; }
+
+  /* work */
+  .work-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px 24px; }
+  @media (max-width: 760px) { .work-grid { grid-template-columns: 1fr; } }
+  .work-grid .viewer { aspect-ratio: 16 / 10; }
+  .work-grid figure { margin: 0; }
+  .work-grid figcaption { margin-top: 10px; font-size: 15px; }
+  .work-grid figcaption b { display: block; font-weight: 600; font-size: 17px; }
+  .work-grid figcaption span { color: var(--ink-2); }
+  .work-note { margin-top: 32px; font-size: 15px; color: var(--ink-2); max-width: 64ch; }
+
+  /* process — a real sequence, so numbered */
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; counter-reset: step; }
+  @media (max-width: 900px) { .steps { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 520px) { .steps { grid-template-columns: 1fr; } }
+  .step { border-top: 2px solid var(--line-strong); padding-top: 14px; }
+  .step::before { counter-increment: step; content: counter(step); display: inline-block; font-weight: 600; color: var(--accent); margin-bottom: 8px; }
+  .step h3 { font-size: 19px; }
+  .step p { color: var(--ink-2); font-size: 16px; margin-top: 6px; }
+
+  /* audiences */
+  .aud { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 40px; }
+  @media (max-width: 760px) { .aud { grid-template-columns: 1fr; } }
+  .aud li { padding: 18px 0; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 200px 1fr; gap: 16px; }
+  @media (max-width: 520px) { .aud li { grid-template-columns: 1fr; gap: 4px; } }
+  .aud li b { font-weight: 600; }
+  .aud li span { color: var(--ink-2); font-size: 16px; }
+
+  /* about */
+  .about-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: clamp(32px, 5vw, 72px); }
+  @media (max-width: 900px) { .about-grid { grid-template-columns: 1fr; } }
+  .kit li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 16px; font-size: 16px; }
+  .kit li span { color: var(--ink-2); text-align: right; }
+
+  /* contact */
+  .contact { background: var(--ink); color: #fff; border-top: 0; }
+  .contact h2 { color: #fff; }
+  .contact .lede { color: #C3CAD2; }
+  .contact .btn { border-color: #fff; color: #fff; }
+  .contact .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .contact .btn.primary:hover { background: #fff; color: var(--ink); border-color: #fff; }
+  .intake { margin-top: 36px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; font-size: 15px; color: #C3CAD2; }
+  @media (max-width: 760px) { .intake { grid-template-columns: repeat(2, 1fr); } }
+  .intake li { border-top: 1px solid #3A4650; padding-top: 10px; }
+  .intake b { color: #fff; display: block; font-weight: 600; }
+
+  footer { background: var(--ink); color: #8F9AA5; font-size: 14px; padding: 28px 0; border-top: 1px solid #3A4650; }
+  footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  footer a { color: #C3CAD2; text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#top">UBQT <span>Digital Ubiquities</span></a>
+    <ul>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#work">Work</a></li>
+      <li><a href="#process">Process</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+      <li class="sibling"><a href="https://xr.ubqt.is">XR studio</a></li>
+    </ul>
+  </div>
+</header>
+
+<main id="top">
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow">3D scanning and allied services · Los Angeles</p>
+      <h1>Capture the real thing. Deliver the data.</h1>
+      <p class="lede">Digital Ubiquities scans objects, interiors, and sites — LiDAR, photogrammetry, structured light, and aerial — and hands back clean point clouds, meshes, and XR-ready assets your team can actually use.</p>
+      <div class="btn-row">
+        <a class="btn primary" href="#contact">Request a capture</a>
+        <a class="btn" href="#work">See the scans</a>
+      </div>
+      <div class="proofs">
+        <div><strong>Sub-millimeter to site scale</strong>one studio, four capture methods</div>
+        <div><strong>274-day scan series</strong>a capture published every day, 2021–22</div>
+        <div><strong>Any pipeline</strong>Revit, Blender, Unity, Unreal, web</div>
+      </div>
+    </div>
+    <div>
+      <!--
+        HERO VIEWER
+        Set data-model to any Sketchfab model ID (the hash in the model URL).
+        Currently: Day 099 — Antique Door Knocker.
+      -->
+      <div class="viewer" data-model="a9d25ff95e0840d2905096b45def8899" data-title="Antique door knocker">
+        <button class="poster" type="button" aria-label="Load interactive 3D scan">
+          <span class="dot" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+          <span>Load the 3D scan</span>
+          <small>Interactive · rotate, zoom, inspect</small>
+        </button>
+      </div>
+      <p class="viewer-cap"><b>Brass door knocker, The Parthenon, Nashville</b><span>Photogrammetry · 60 images</span></p>
+    </div>
+  </div>
+</section>
+
+<div class="ruler-wrap">
+  <div class="wrap">
+    <p class="eyebrow">What we capture, by scale</p>
+    <div class="ruler">
+      <div class="track"><span class="pin"></span><span class="pin"></span><span class="pin"></span></div>
+      <div class="marks"><span>0.1 mm</span><span>1 cm</span><span>1 m</span><span>10 m</span><span>100 m</span><span>1 acre+</span></div>
+    </div>
+    <div class="tiers">
+      <div class="tier">
+        <h3>Objects and components</h3>
+        <p class="range">0.05 mm resolution · Revopoint POP 4 structured light</p>
+        <p>Equipment, fixtures, parts, artifacts, and hand-scale products. Watertight meshes for CAD, 3D printing, Revit families, and product visualization.</p>
+      </div>
+      <div class="tier">
+        <h3>Interiors and structures</h3>
+        <p class="range">±1 cm · handheld SLAM and LiDAR</p>
+        <p>Rooms, floors, and mechanical spaces. Registered point clouds for as-built modeling, MEP verification, and space documentation.</p>
+      </div>
+      <div class="tier">
+        <h3>Sites and exteriors</h3>
+        <p class="range">Aerial and ground photogrammetry</p>
+        <p>Roofs, façades, lots, and terrain. Photo-textured meshes, orthomosaics, and Gaussian splats for planning and presentation.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="services">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Services</p>
+      <h2>Field capture through final deliverable, under one roof.</h2>
+      <p class="lede">We don't stop at the raw scan. Every capture is cleaned, registered, and delivered in the format your downstream tools expect.</p>
+    </div>
+    <div class="cards">
+      <article class="card">
+        <h3>Field capture</h3>
+        <p>On-site scanning across Los Angeles and the South Bay, with travel across California by arrangement. Comfortable on roofs, in crawlspaces, and in occupied buildings.</p>
+        <ul>
+          <li>Handheld SLAM / LiDAR interiors</li>
+          <li>Ground and aerial photogrammetry</li>
+          <li>Structured-light object scanning</li>
+          <li>Overflow capture for BIM and survey firms</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>Processing and delivery</h3>
+        <p>Registration, cleanup, decimation, retopology, and format conversion — so what arrives is ready to open, not a project of its own.</p>
+        <ul>
+          <li>Point cloud registration and cleanup</li>
+          <li>Mesh reconstruction and retopo</li>
+          <li>Scale verification and units</li>
+          <li>Blender, Unity, and Unreal-ready assets</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>XR and digital twins</h3>
+        <p>Scan data turned into something people can walk through — VR walkthroughs, interactive web viewers, and Gaussian splat scenes — built by the same studio that ships XR simulators to universities.</p>
+        <ul>
+          <li>VR walkthroughs on Meta Quest</li>
+          <li>Web-embeddable 3D and splat viewers</li>
+          <li>Digital twin scenes for facility teams</li>
+          <li>Custom interaction and annotation</li>
+        </ul>
+      </article>
+    </div>
+    <ul class="formats" aria-label="Deliverable formats">
+      <li>E57</li><li>LAS <span>/ LAZ</span></li><li>PLY</li><li>OBJ</li><li>FBX</li><li>glTF <span>/ GLB</span></li><li>STL</li><li>USDZ</li><li>Gaussian splat <span>PLY / SOG</span></li><li>Orthomosaic <span>GeoTIFF</span></li>
+    </ul>
+  </div>
+</section>
+
+<section id="work">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Selected scans</p>
+      <h2>Real captures, in the browser.</h2>
+      <p class="lede">Every model below is interactive. Load one and inspect it the way a client would — orbit, zoom, look for the seams.</p>
+    </div>
+
+    <!--
+      WORK GRID
+      Each <figure> is one Sketchfab embed slot. To add a scan, copy a figure and
+      set data-model to the Sketchfab model ID. Slots load on click to keep the
+      page light. Add or remove figures freely; the grid reflows.
+    -->
+    <div class="work-grid">
+
+      <figure>
+        <div class="viewer" data-model="4c8785393e194f2483cfb33dd683918e" data-title="The Vault conference room">
+          <button class="poster" type="button" aria-label="Load interactive 3D scan"><span class="dot" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span><span>Load the 3D scan</span></button>
+        </div>
+        <figcaption><b>The Vault — hotel conference room</b><span>Interior capture · Magnolia Hotel, Denver · 120+ images</span></figcaption>
+      </figure>
+
+      <figure>
+        <div class="viewer" data-model="7203085ab8c34c7b9cb3e616e76fb940" data-title="CASE 580 Super M loader backhoe">
+          <button class="poster" type="button" aria-label="Load interactive 3D scan"><span class="dot" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span><span>Load the 3D scan</span></button>
+        </div>
+        <figcaption><b>CASE 580 Super M loader backhoe</b><span>Heavy equipment · active construction site · 250 images</span></figcaption>
+      </figure>
+
+      <figure>
+        <div class="viewer" data-model="711a21e8fd714f0080920255dd6d29e0" data-title="Aztec vase">
+          <button class="poster" type="button" aria-label="Load interactive 3D scan"><span class="dot" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span><span>Load the 3D scan</span></button>
+        </div>
+        <figcaption><b>Aztec vase</b><span>Artifact capture · 180 images</span></figcaption>
+      </figure>
+
+      <figure>
+        <div class="viewer" data-model="7575ed5029434d529f0fdf2487f550ad" data-title="Force, Ruckstull sculpture">
+          <button class="poster" type="button" aria-label="Load interactive 3D scan"><span class="dot" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span><span>Load the 3D scan</span></button>
+        </div>
+        <figcaption><b>Force — Frederick Ruckstull, NY Appellate Court</b><span>Large sculpture in uncontrolled conditions · 60 images</span></figcaption>
+      </figure>
+
+      <!--
+        SPLAT SLOT (self-hosted, not Sketchfab)
+        When your Luma drone captures are cleaned in SuperSplat, replace this
+        figure's inner .viewer with an <iframe src="/splats/your-scene.html">
+        pointing at a SuperSplat HTML export, or a PlayCanvas / three.js viewer.
+      -->
+      <!--
+      <figure>
+        <div class="viewer"><iframe src="/splats/site-name.html" title="Gaussian splat — site name" loading="lazy"></iframe></div>
+        <figcaption><b>Site name</b><span>Aerial photogrammetry · Gaussian splat</span></figcaption>
+      </figure>
+      -->
+
+    </div>
+    <p class="work-note">These scans come from a daily capture practice — one published scan every day for 274 days. Scan quality is shown as captured, including the hard cases. Full archive on <a href="https://sketchfab.com/uttamg911">Sketchfab</a>.</p>
+  </div>
+</section>
+
+<section id="process">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Process</p>
+      <h2>Four steps from site visit to delivered file.</h2>
+    </div>
+    <div class="steps">
+      <div class="step"><h3>Scope</h3><p>You send the address or object, the scope, rough size, and deadline. We recommend a capture method and quote a fixed price.</p></div>
+      <div class="step"><h3>Capture</h3><p>On-site visit with the right kit for the scale. Most interiors are captured in a single visit; objects can be shipped or scanned on site.</p></div>
+      <div class="step"><h3>Process</h3><p>Registration, cleanup, and conversion. You get a preview link to check coverage before final delivery.</p></div>
+      <div class="step"><h3>Deliver</h3><p>Files in the formats you named, with units and coordinate notes. Typical turnaround is one to five business days depending on scale.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="audiences">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Who this is for</p>
+      <h2>Teams that need the data, not just the pictures.</h2>
+    </div>
+    <ul class="aud">
+      <li><b>BIM and as-built firms</b><span>Overflow field capture and point cloud processing on a per-project basis, delivered ready for Revit.</span></li>
+      <li><b>Architects and designers</b><span>Existing-conditions capture for renovation, tenant improvement, and ADU work.</span></li>
+      <li><b>Product and industrial design</b><span>Reverse engineering, reference scans, and fixture documentation at sub-millimeter resolution.</span></li>
+      <li><b>Facility and property teams</b><span>Space documentation, equipment records, and walkthroughs that outlast the next tenant.</span></li>
+      <li><b>Museums, archives, and artists</b><span>Object and sculpture digitization for study, exhibition, and reproduction.</span></li>
+      <li><b>Simulation and education</b><span>Real-world assets for VR training scenes — the same pipeline behind our clinical simulators.</span></li>
+    </ul>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap about-grid">
+    <div>
+      <p class="eyebrow">About</p>
+      <h2>A capture practice inside an XR engineering studio.</h2>
+      <p class="lede" style="margin-top:20px">Digital Ubiquities is a Long Beach–based creative technology studio best known for VR clinical simulators deployed at NYU and other universities. Scanning grew out of that work: simulation scenes need real geometry, and the studio has been capturing it — daily, for years — long before it was a service.</p>
+      <p class="lede" style="margin-top:16px">The practice is led by an engineer with dual degrees in Physics and Mechanical Engineering and twelve years across XR development, interactive installations, and fabrication. Studio work has been juried and awarded at SIGGRAPH, AWE, and MIT Reality Hack. See the simulation side at <a href="https://xr.ubqt.is">xr.ubqt.is</a>.</p>
+    </div>
+    <div>
+      <p class="eyebrow">Field kit</p>
+      <!-- Edit freely. Add "Part 107 certified" to the aerial line if applicable. -->
+      <ul class="kit">
+        <li>Structured light <span>Revopoint POP 4 · 0.05 mm</span></li>
+        <li>Handheld capture <span>SLAM / LiDAR scanner · iPhone Pro LiDAR</span></li>
+        <li>Photogrammetry <span>Ground and aerial · Polycam, RealityCapture, Luma</span></li>
+        <li>Aerial <span>Drone photogrammetry and inspection</span></li>
+        <li>Processing <span>CloudCompare, Blender, SuperSplat, Unity</span></li>
+        <li>Delivery <span>Sketchfab, self-hosted web viewers, Quest builds</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="contact">
+  <div class="wrap">
+    <h2>Planning a capture?</h2>
+    <p class="lede" style="margin-top:16px;max-width:52ch">Send the basics and we'll recommend a method and send a fixed quote, usually within one business day. Test captures on a small site are welcome.</p>
+    <div class="btn-row" style="margin-top:28px">
+      <a class="btn primary" href="mailto:hello@ubqt.is?subject=Scanning%20request">Email hello@ubqt.is</a>
+      <a class="btn" href="https://xr.ubqt.is">XR simulation studio</a>
+    </div>
+    <ul class="intake">
+      <li><b>Address or object</b>where it is, or what it is</li>
+      <li><b>Scope</b>which rooms, elevations, or parts</li>
+      <li><b>Size</b>square footage, or object dimensions</li>
+      <li><b>Deadline and formats</b>when, and what you'll open it in</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Digital Ubiquities LLC</span>
+    <span><a href="https://xr.ubqt.is">xr.ubqt.is</a> · <a href="https://sketchfab.com/uttamg911">Sketchfab</a> · <a href="mailto:hello@ubqt.is">hello@ubqt.is</a></span>
+  </div>
+</footer>
+
+<script>
+  // Click-to-load Sketchfab embeds. Nothing loads until a visitor asks for it.
+  document.querySelectorAll('.viewer[data-model]').forEach(function (v) {
+    var btn = v.querySelector('.poster');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      var id = v.dataset.model;
+      var f = document.createElement('iframe');
+      f.title = v.dataset.title || '3D scan';
+      f.allow = 'autoplay; fullscreen; xr-spatial-tracking';
+      f.setAttribute('allowfullscreen', '');
+      f.src = 'https://sketchfab.com/models/' + id + '/embed?autostart=1&ui_theme=dark&ui_infos=0&ui_watermark=0&ui_watermark_link=0&preload=1';
+      v.appendChild(f);
+      v.classList.add('is-loaded');
+    });
+  });
+</script>
+</body>
+</html>
