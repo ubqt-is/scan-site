@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Digital Ubiquities — 3D Scanning & Spatial Capture</title>
-<meta name="description" content="Object, interior, and site capture in Los Angeles — LiDAR, photogrammetry, structured light, and aerial — delivered as clean point clouds, meshes, and XR-ready assets.">
+<title>3D Scanning &amp; Photogrammetry in Los Angeles — Digital Ubiquities</title>
+<meta name="description" content="3D scanning, photogrammetry, and LiDAR capture in Los Angeles and the South Bay. Objects, interiors, and sites delivered as point clouds, meshes, and Gaussian splats.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -79,16 +79,13 @@
 
   /* embedded scan viewer */
   .viewer { position: relative; background: #D5DADF; border: 1px solid var(--line); border-radius: var(--radius); aspect-ratio: 4 / 3; overflow: hidden; }
-  .viewer iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-  .viewer .poster { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; cursor: pointer; border: 0; background:
+  .viewer iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; opacity: 0; transition: opacity .4s; }
+  .viewer.is-ready iframe { opacity: 1; }
+  .viewer::before { content: ""; position: absolute; inset: 0; background:
       linear-gradient(var(--line) 1px, transparent 1px) 0 0 / 24px 24px,
-      linear-gradient(90deg, var(--line) 1px, transparent 1px) 0 0 / 24px 24px, #D5DADF;
-    color: var(--ink); font-family: inherit; }
-  .viewer .poster .dot { width: 56px; height: 56px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; color: #fff; }
-  .viewer .poster .dot svg { width: 22px; height: 22px; }
-  .viewer .poster small { font-size: 14px; color: var(--ink-2); }
-  .viewer .poster:hover .dot { transform: scale(1.06); }
-  .viewer.is-loaded .poster { display: none; }
+      linear-gradient(90deg, var(--line) 1px, transparent 1px) 0 0 / 24px 24px, #D5DADF; }
+  .viewer::after { content: "Loading 3D model"; position: absolute; inset: 0; display: grid; place-items: center; font-size: 14px; color: var(--ink-2); }
+  .viewer.is-ready::before, .viewer.is-ready::after { display: none; }
   .viewer-cap { display: flex; justify-content: space-between; gap: 16px; font-size: 14px; color: var(--ink-2); margin-top: 10px; }
   .viewer-cap b { color: var(--ink); font-weight: 500; }
 
@@ -170,6 +167,15 @@
   .intake li { border-top: 1px solid #3A4650; padding-top: 10px; }
   .intake b { color: #fff; display: block; font-weight: 600; }
 
+  .faq { max-width: 760px; }
+  .faq details { border-top: 1px solid var(--line); padding: 18px 0; }
+  .faq details:last-child { border-bottom: 1px solid var(--line); }
+  .faq summary { cursor: pointer; font-weight: 600; font-size: 18px; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: "+"; color: var(--accent); font-weight: 500; }
+  .faq details[open] summary::after { content: "–"; }
+  .faq details p { margin-top: 10px; color: var(--ink-2); max-width: 64ch; }
+
   footer { background: var(--ink); color: #8F9AA5; font-size: 14px; padding: 28px 0; border-top: 1px solid #3A4650; }
   footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
   footer a { color: #C3CAD2; text-decoration: none; }
@@ -183,8 +189,8 @@
     <ul>
       <li><a href="#services">Services</a></li>
       <li><a href="#work">Work</a></li>
-      <li><a href="#process">Process</a></li>
-      <li><a href="#about">About</a></li>
+      <li><a href="#process">How it works</a></li>
+      <li><a href="#faq">FAQ</a></li>
       <li><a href="#contact">Contact</a></li>
       <li class="sibling"><a href="https://xr.ubqt.is">XR studio</a></li>
     </ul>
@@ -196,17 +202,17 @@
 <section class="hero">
   <div class="wrap hero-grid">
     <div>
-      <p class="eyebrow">3D scanning and allied services · Los Angeles</p>
-      <h1>Capture the real thing. Deliver the data.</h1>
-      <p class="lede">Digital Ubiquities scans objects, interiors, and sites — LiDAR, photogrammetry, structured light, and aerial — and hands back clean point clouds, meshes, and XR-ready assets your team can actually use.</p>
+      <p class="eyebrow">Los Angeles and the South Bay</p>
+      <h1>3D scanning and photogrammetry services</h1>
+      <p class="lede">We scan objects, rooms, buildings, and sites and deliver the results as point clouds, meshes, and Gaussian splats. Capture is done on location with handheld LiDAR, structured-light scanners, cameras, and drones. Files are cleaned and delivered in the format you work in.</p>
       <div class="btn-row">
-        <a class="btn primary" href="#contact">Request a capture</a>
-        <a class="btn" href="#work">See the scans</a>
+        <a class="btn primary" href="#contact">Get a quote</a>
+        <a class="btn" href="#work">View sample scans</a>
       </div>
       <div class="proofs">
-        <div><strong>Sub-millimeter to site scale</strong>one studio, four capture methods</div>
-        <div><strong>274-day scan series</strong>a capture published every day, 2021–22</div>
-        <div><strong>Any pipeline</strong>Revit, Blender, Unity, Unreal, web</div>
+        <div><strong>Objects to acreage</strong>four capture methods on hand</div>
+        <div><strong>300+ day scan project</strong>one published scan a day, 2021–22</div>
+        <div><strong>E57, PLY, OBJ, glTF, splat</strong>delivered in the format you work in</div>
       </div>
     </div>
     <div>
@@ -215,40 +221,35 @@
         Set data-model to any Sketchfab model ID (the hash in the model URL).
         Currently: Day 099 — Antique Door Knocker.
       -->
-      <div class="viewer" data-model="a9d25ff95e0840d2905096b45def8899" data-title="Antique door knocker">
-        <button class="poster" type="button" aria-label="Load interactive 3D scan">
-          <span class="dot" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
-          <span>Load the 3D scan</span>
-          <small>Interactive · rotate, zoom, inspect</small>
-        </button>
+      <div class="viewer" data-model="a9d25ff95e0840d2905096b45def8899" data-title="Antique door knocker" data-eager><iframe title="Antique door knocker" allow="autoplay; fullscreen; xr-spatial-tracking" allowfullscreen></iframe>
       </div>
-      <p class="viewer-cap"><b>Brass door knocker, The Parthenon, Nashville</b><span>Photogrammetry · 60 images</span></p>
+      <p class="viewer-cap"><b>Brass door knocker, The Parthenon, Nashville</b><span>Photogrammetry, 60 photos</span></p>
     </div>
   </div>
 </section>
 
 <div class="ruler-wrap">
   <div class="wrap">
-    <p class="eyebrow">What we capture, by scale</p>
+    <p class="eyebrow">Capture methods by size of subject</p>
     <div class="ruler">
       <div class="track"><span class="pin"></span><span class="pin"></span><span class="pin"></span></div>
       <div class="marks"><span>0.1 mm</span><span>1 cm</span><span>1 m</span><span>10 m</span><span>100 m</span><span>1 acre+</span></div>
     </div>
     <div class="tiers">
       <div class="tier">
-        <h3>Objects and components</h3>
-        <p class="range">0.05 mm resolution · Revopoint POP 4 structured light</p>
-        <p>Equipment, fixtures, parts, artifacts, and hand-scale products. Watertight meshes for CAD, 3D printing, Revit families, and product visualization.</p>
+        <h3>Small objects and parts</h3>
+        <p class="range">Structured light, up to 0.05 mm point spacing</p>
+        <p>Machine parts, fixtures, hardware, artifacts, and products up to roughly a meter. Output is a watertight mesh suitable for CAD, 3D printing, and reverse engineering.</p>
       </div>
       <div class="tier">
-        <h3>Interiors and structures</h3>
-        <p class="range">±1 cm · handheld SLAM and LiDAR</p>
-        <p>Rooms, floors, and mechanical spaces. Registered point clouds for as-built modeling, MEP verification, and space documentation.</p>
+        <h3>Rooms and buildings</h3>
+        <p class="range">Handheld LiDAR and SLAM, roughly 1 cm accuracy</p>
+        <p>Residential and commercial interiors, mechanical rooms, and building exteriors. Output is a registered point cloud your modeler or architect can take into CAD or BIM software.</p>
       </div>
       <div class="tier">
-        <h3>Sites and exteriors</h3>
+        <h3>Sites, roofs, and terrain</h3>
         <p class="range">Aerial and ground photogrammetry</p>
-        <p>Roofs, façades, lots, and terrain. Photo-textured meshes, orthomosaics, and Gaussian splats for planning and presentation.</p>
+        <p>Lots, rooflines, façades, and outdoor sites. Output is a textured mesh, orthomosaic, or Gaussian splat for planning, inspection, and presentation.</p>
       </div>
     </div>
   </div>
@@ -258,38 +259,38 @@
   <div class="wrap">
     <div class="section-head">
       <p class="eyebrow">Services</p>
-      <h2>Field capture through final deliverable, under one roof.</h2>
-      <p class="lede">We don't stop at the raw scan. Every capture is cleaned, registered, and delivered in the format your downstream tools expect.</p>
+      <h2>What we do</h2>
+      <p class="lede">Every job includes on-site capture, processing, and delivery in the formats you specify. We also take overflow field capture from BIM, survey, and VFX vendors on a per-project basis; you keep the modeling in-house, we supply the data.</p>
     </div>
     <div class="cards">
       <article class="card">
-        <h3>Field capture</h3>
-        <p>On-site scanning across Los Angeles and the South Bay, with travel across California by arrangement. Comfortable on roofs, in crawlspaces, and in occupied buildings.</p>
+        <h3>On-site capture</h3>
+        <p>We come to the site with the equipment the job needs. Based in Long Beach, covering Los Angeles County and Orange County; the rest of California by arrangement. Roofs, ladders, crawlspaces, and occupied buildings are fine.</p>
         <ul>
-          <li>Handheld SLAM / LiDAR interiors</li>
-          <li>Ground and aerial photogrammetry</li>
-          <li>Structured-light object scanning</li>
-          <li>Overflow capture for BIM and survey firms</li>
+          <li>Interior LiDAR and SLAM walkthroughs</li>
+          <li>Exterior and aerial photogrammetry</li>
+          <li>Structured-light scans of objects and equipment</li>
+          <li>Subcontract field capture for BIM and survey firms</li>
         </ul>
       </article>
       <article class="card">
-        <h3>Processing and delivery</h3>
-        <p>Registration, cleanup, decimation, retopology, and format conversion — so what arrives is ready to open, not a project of its own.</p>
+        <h3>Processing</h3>
+        <p>Raw scans are registered, cleaned of noise and stray points, decimated to a usable size, and checked for scale. Meshes are reconstructed and retopologized when a job calls for it.</p>
         <ul>
           <li>Point cloud registration and cleanup</li>
-          <li>Mesh reconstruction and retopo</li>
-          <li>Scale verification and units</li>
-          <li>Blender, Unity, and Unreal-ready assets</li>
+          <li>Mesh reconstruction and decimation</li>
+          <li>Scale and unit verification</li>
+          <li>Format conversion</li>
         </ul>
       </article>
       <article class="card">
-        <h3>XR and digital twins</h3>
-        <p>Scan data turned into something people can walk through — VR walkthroughs, interactive web viewers, and Gaussian splat scenes — built by the same studio that ships XR simulators to universities.</p>
+        <h3>Viewers and VR</h3>
+        <p>If you need the scan to be seen and not just measured, we build the viewer. Web-embeddable models, Gaussian splat scenes, and VR walkthroughs on Meta Quest, produced by the same studio that builds VR training simulators for universities.</p>
         <ul>
-          <li>VR walkthroughs on Meta Quest</li>
-          <li>Web-embeddable 3D and splat viewers</li>
-          <li>Digital twin scenes for facility teams</li>
-          <li>Custom interaction and annotation</li>
+          <li>Embeddable 3D and splat viewers</li>
+          <li>VR walkthroughs for Meta Quest</li>
+          <li>Digital twins for facility teams</li>
+          <li>Custom annotation and interaction</li>
         </ul>
       </article>
     </div>
@@ -302,9 +303,9 @@
 <section id="work">
   <div class="wrap">
     <div class="section-head">
-      <p class="eyebrow">Selected scans</p>
-      <h2>Real captures, in the browser.</h2>
-      <p class="lede">Every model below is interactive. Load one and inspect it the way a client would — orbit, zoom, look for the seams.</p>
+      <p class="eyebrow">Sample scans</p>
+      <h2>Recent work</h2>
+      <p class="lede">These are interactive. Click to load a model, then rotate and zoom to check detail and coverage.</p>
     </div>
 
     <!--
@@ -316,31 +317,27 @@
     <div class="work-grid">
 
       <figure>
-        <div class="viewer" data-model="4c8785393e194f2483cfb33dd683918e" data-title="The Vault conference room">
-          <button class="poster" type="button" aria-label="Load interactive 3D scan"><span class="dot" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span><span>Load the 3D scan</span></button>
+        <div class="viewer" data-model="4c8785393e194f2483cfb33dd683918e" data-title="The Vault conference room"><iframe title="The Vault conference room" allow="autoplay; fullscreen; xr-spatial-tracking" allowfullscreen></iframe>
         </div>
-        <figcaption><b>The Vault — hotel conference room</b><span>Interior capture · Magnolia Hotel, Denver · 120+ images</span></figcaption>
+        <figcaption><b>Conference room, Magnolia Hotel, Denver</b><span>Interior photogrammetry, 120+ photos</span></figcaption>
       </figure>
 
       <figure>
-        <div class="viewer" data-model="7203085ab8c34c7b9cb3e616e76fb940" data-title="CASE 580 Super M loader backhoe">
-          <button class="poster" type="button" aria-label="Load interactive 3D scan"><span class="dot" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span><span>Load the 3D scan</span></button>
+        <div class="viewer" data-model="7203085ab8c34c7b9cb3e616e76fb940" data-title="CASE 580 Super M loader backhoe"><iframe title="CASE 580 Super M loader backhoe" allow="autoplay; fullscreen; xr-spatial-tracking" allowfullscreen></iframe>
         </div>
-        <figcaption><b>CASE 580 Super M loader backhoe</b><span>Heavy equipment · active construction site · 250 images</span></figcaption>
+        <figcaption><b>CASE 580 Super M loader backhoe</b><span>Construction site, 250 photos</span></figcaption>
       </figure>
 
       <figure>
-        <div class="viewer" data-model="711a21e8fd714f0080920255dd6d29e0" data-title="Aztec vase">
-          <button class="poster" type="button" aria-label="Load interactive 3D scan"><span class="dot" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span><span>Load the 3D scan</span></button>
+        <div class="viewer" data-model="711a21e8fd714f0080920255dd6d29e0" data-title="Aztec vase"><iframe title="Aztec vase" allow="autoplay; fullscreen; xr-spatial-tracking" allowfullscreen></iframe>
         </div>
-        <figcaption><b>Aztec vase</b><span>Artifact capture · 180 images</span></figcaption>
+        <figcaption><b>Aztec vase</b><span>Tabletop photogrammetry, 180 photos</span></figcaption>
       </figure>
 
       <figure>
-        <div class="viewer" data-model="7575ed5029434d529f0fdf2487f550ad" data-title="Force, Ruckstull sculpture">
-          <button class="poster" type="button" aria-label="Load interactive 3D scan"><span class="dot" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span><span>Load the 3D scan</span></button>
+        <div class="viewer" data-model="7575ed5029434d529f0fdf2487f550ad" data-title="Force, Ruckstull sculpture"><iframe title="Force, Ruckstull sculpture" allow="autoplay; fullscreen; xr-spatial-tracking" allowfullscreen></iframe>
         </div>
-        <figcaption><b>Force — Frederick Ruckstull, NY Appellate Court</b><span>Large sculpture in uncontrolled conditions · 60 images</span></figcaption>
+        <figcaption><b>"Force," New York State Appellate Court</b><span>Outdoor sculpture, 60 photos</span></figcaption>
       </figure>
 
       <!--
@@ -352,26 +349,26 @@
       <!--
       <figure>
         <div class="viewer"><iframe src="/splats/site-name.html" title="Gaussian splat — site name" loading="lazy"></iframe></div>
-        <figcaption><b>Site name</b><span>Aerial photogrammetry · Gaussian splat</span></figcaption>
+        <figcaption><b>Site name</b><span>Aerial photogrammetry, Gaussian splat</span></figcaption>
       </figure>
       -->
 
     </div>
-    <p class="work-note">These scans come from a daily capture practice — one published scan every day for 274 days. Scan quality is shown as captured, including the hard cases. Full archive on <a href="https://sketchfab.com/uttamg911">Sketchfab</a>.</p>
+    <p class="work-note">More scans, including the full 300+ day series, are on <a href="https://sketchfab.com/uttamg911">Sketchfab</a>. Models are shown as captured; nothing has been patched or resculpted.</p>
   </div>
 </section>
 
 <section id="process">
   <div class="wrap">
     <div class="section-head">
-      <p class="eyebrow">Process</p>
-      <h2>Four steps from site visit to delivered file.</h2>
+      <p class="eyebrow">How it works</p>
+      <h2>From inquiry to delivered files</h2>
     </div>
     <div class="steps">
-      <div class="step"><h3>Scope</h3><p>You send the address or object, the scope, rough size, and deadline. We recommend a capture method and quote a fixed price.</p></div>
-      <div class="step"><h3>Capture</h3><p>On-site visit with the right kit for the scale. Most interiors are captured in a single visit; objects can be shipped or scanned on site.</p></div>
-      <div class="step"><h3>Process</h3><p>Registration, cleanup, and conversion. You get a preview link to check coverage before final delivery.</p></div>
-      <div class="step"><h3>Deliver</h3><p>Files in the formats you named, with units and coordinate notes. Typical turnaround is one to five business days depending on scale.</p></div>
+      <div class="step"><h3>Send the details</h3><p>Address or object, what you need scanned, approximate square footage or dimensions, deadline, and the software you'll open the files in.</p></div>
+      <div class="step"><h3>Quote</h3><p>We reply with a recommended method and a fixed price, usually within one business day.</p></div>
+      <div class="step"><h3>Capture</h3><p>Most interiors are scanned in one visit. Objects can be scanned on site or shipped to us.</p></div>
+      <div class="step"><h3>Delivery</h3><p>You get a preview link to check coverage, then the final files. Typical turnaround is one to five business days depending on scale.</p></div>
     </div>
   </div>
 </section>
@@ -379,17 +376,48 @@
 <section id="audiences">
   <div class="wrap">
     <div class="section-head">
-      <p class="eyebrow">Who this is for</p>
-      <h2>Teams that need the data, not just the pictures.</h2>
+      <p class="eyebrow">Clients</p>
+      <h2>Who we work with</h2>
     </div>
     <ul class="aud">
-      <li><b>BIM and as-built firms</b><span>Overflow field capture and point cloud processing on a per-project basis, delivered ready for Revit.</span></li>
-      <li><b>Architects and designers</b><span>Existing-conditions capture for renovation, tenant improvement, and ADU work.</span></li>
-      <li><b>Product and industrial design</b><span>Reverse engineering, reference scans, and fixture documentation at sub-millimeter resolution.</span></li>
-      <li><b>Facility and property teams</b><span>Space documentation, equipment records, and walkthroughs that outlast the next tenant.</span></li>
-      <li><b>Museums, archives, and artists</b><span>Object and sculpture digitization for study, exhibition, and reproduction.</span></li>
-      <li><b>Simulation and education</b><span>Real-world assets for VR training scenes — the same pipeline behind our clinical simulators.</span></li>
+      <li><b>BIM and as-built firms</b><span>Field capture on a subcontract basis. We deliver registered, cleaned point clouds in E57 or LAS; your team does the modeling.</span></li>
+      <li><b>Architects and contractors</b><span>Existing-conditions capture for remodels, tenant improvements, and ADUs.</span></li>
+      <li><b>Product and mechanical designers</b><span>Reverse engineering, reference scans, and fixture documentation.</span></li>
+      <li><b>Property and facility managers</b><span>Room and equipment documentation, and virtual walkthroughs.</span></li>
+      <li><b>Museums, collectors, and artists</b><span>Object and sculpture digitization for records, exhibition, and reproduction.</span></li>
+      <li><b>Simulation and training programs</b><span>Real-world assets for VR scenes. This is the pipeline behind our clinical simulators.</span></li>
     </ul>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">FAQ</p>
+      <h2>Common questions</h2>
+    </div>
+    <div class="faq">
+      <details>
+        <summary>LiDAR or photogrammetry?</summary>
+        <p>LiDAR measures distance directly, so it's reliable indoors, in low light, and on plain surfaces like white walls. Photogrammetry builds geometry from overlapping photos, so it produces better color and fine surface detail but needs good light and texture. Many jobs use both: LiDAR for the room geometry, photos for the detail. We recommend a method once we see the site.</p>
+      </details>
+      <details>
+        <summary>What accuracy can I expect?</summary>
+        <p>Structured-light object scans resolve down to about 0.05 mm. Handheld LiDAR interiors are typically accurate to about a centimeter over a room, which is adequate for as-builts, space planning, and most renovation work. If you need survey-grade tolerances for legal or structural purposes, tell us and we'll say whether the job needs a terrestrial scanner or a licensed surveyor.</p>
+      </details>
+      <details>
+        <summary>What files do I get? Do you do Revit modeling?</summary>
+        <p>Point clouds in E57, LAS/LAZ, or PLY. Meshes in OBJ, FBX, glTF/GLB, STL, or USDZ. Gaussian splats as PLY or SOG. Orthomosaics as GeoTIFF. We don't do Revit or BIM modeling ourselves; we deliver clean point clouds that your modeler imports directly.</p>
+      </details>
+      <details>
+        <summary>Do you fly drones?</summary>
+        <p>Yes, for aerial photogrammetry of roofs, lots, and sites. Airspace and site conditions determine what's possible at a given address; we check before quoting.</p>
+      </details>
+      <details>
+        <summary>How much does it cost?</summary>
+        <p>It depends on size, access, and deliverables. Small objects start in the low hundreds; a typical residential interior is quoted per square foot; sites are quoted per visit. Send the details and we'll give you a fixed number.</p>
+      </details>
+    </div>
   </div>
 </section>
 
@@ -397,20 +425,20 @@
   <div class="wrap about-grid">
     <div>
       <p class="eyebrow">About</p>
-      <h2>A capture practice inside an XR engineering studio.</h2>
-      <p class="lede" style="margin-top:20px">Digital Ubiquities is a Long Beach–based creative technology studio best known for VR clinical simulators deployed at NYU and other universities. Scanning grew out of that work: simulation scenes need real geometry, and the studio has been capturing it — daily, for years — long before it was a service.</p>
-      <p class="lede" style="margin-top:16px">The practice is led by an engineer with dual degrees in Physics and Mechanical Engineering and twelve years across XR development, interactive installations, and fabrication. Studio work has been juried and awarded at SIGGRAPH, AWE, and MIT Reality Hack. See the simulation side at <a href="https://xr.ubqt.is">xr.ubqt.is</a>.</p>
+      <h2>Digital Ubiquities</h2>
+      <p class="lede" style="margin-top:20px">Digital Ubiquities is a Long Beach creative technology studio. Most of our work is VR training software for universities, including simulators in use at NYU. Scanning started as a way to get real geometry into those scenes and turned into a daily practice: a 300+ day project publishing one scan a day through 2021 and 2022, covering everything from door hardware to heavy equipment.</p>
+      <p class="lede" style="margin-top:16px">The studio is run by an engineer with degrees in Physics and Mechanical Engineering and twelve years in XR development, interactive installations, and fabrication. Our work has been juried at SIGGRAPH and awarded at AWE and MIT Reality Hack. The simulation side of the studio is at <a href="https://xr.ubqt.is">xr.ubqt.is</a>.</p>
     </div>
     <div>
-      <p class="eyebrow">Field kit</p>
-      <!-- Edit freely. Add "Part 107 certified" to the aerial line if applicable. -->
+      <p class="eyebrow">Equipment</p>
+      <!-- Edit freely. Add "FAA Part 107 certified" to the aerial line if applicable. -->
       <ul class="kit">
-        <li>Structured light <span>Revopoint POP 4 · 0.05 mm</span></li>
-        <li>Handheld capture <span>SLAM / LiDAR scanner · iPhone Pro LiDAR</span></li>
-        <li>Photogrammetry <span>Ground and aerial · Polycam, RealityCapture, Luma</span></li>
-        <li>Aerial <span>Drone photogrammetry and inspection</span></li>
-        <li>Processing <span>CloudCompare, Blender, SuperSplat, Unity</span></li>
-        <li>Delivery <span>Sketchfab, self-hosted web viewers, Quest builds</span></li>
+        <li>Structured light <span>Revopoint POP 4</span></li>
+        <li>Handheld LiDAR <span>SLAM scanner, iPhone Pro LiDAR</span></li>
+        <li>Photogrammetry <span>Polycam, RealityCapture, Luma</span></li>
+        <li>Aerial <span>Drone photogrammetry</span></li>
+        <li>Processing <span>CloudCompare, Blender, SuperSplat</span></li>
+        <li>Delivery <span>Sketchfab, self-hosted viewers, Unity builds</span></li>
       </ul>
     </div>
   </div>
@@ -418,17 +446,17 @@
 
 <section id="contact" class="contact">
   <div class="wrap">
-    <h2>Planning a capture?</h2>
-    <p class="lede" style="margin-top:16px;max-width:52ch">Send the basics and we'll recommend a method and send a fixed quote, usually within one business day. Test captures on a small site are welcome.</p>
+    <h2>Request a quote</h2>
+    <p class="lede" style="margin-top:16px;max-width:52ch">Email the details below and we'll reply with a method and a price, usually within one business day. Small test captures are welcome if you want to check the data before committing to a larger job.</p>
     <div class="btn-row" style="margin-top:28px">
-      <a class="btn primary" href="mailto:hello@ubqt.is?subject=Scanning%20request">Email hello@ubqt.is</a>
+      <a class="btn primary" href="mailto:hello@ubqt.is?subject=Scanning%20quote">hello@ubqt.is</a>
       <a class="btn" href="https://xr.ubqt.is">XR simulation studio</a>
     </div>
     <ul class="intake">
-      <li><b>Address or object</b>where it is, or what it is</li>
-      <li><b>Scope</b>which rooms, elevations, or parts</li>
-      <li><b>Size</b>square footage, or object dimensions</li>
-      <li><b>Deadline and formats</b>when, and what you'll open it in</li>
+      <li><b>Location or object</b>address, or what the item is</li>
+      <li><b>Scope</b>rooms, elevations, or parts to include</li>
+      <li><b>Size</b>square footage or dimensions</li>
+      <li><b>Deadline and format</b>when you need it, and what software</li>
     </ul>
   </div>
 </section>
@@ -437,27 +465,53 @@
 
 <footer>
   <div class="wrap">
-    <span>© 2026 Digital Ubiquities LLC</span>
+    <span>© 2026 Digital Ubiquities LLC · Long Beach, CA</span>
     <span><a href="https://xr.ubqt.is">xr.ubqt.is</a> · <a href="https://sketchfab.com/uttamg911">Sketchfab</a> · <a href="mailto:hello@ubqt.is">hello@ubqt.is</a></span>
   </div>
 </footer>
 
+<script src="https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js"></script>
 <script>
-  // Click-to-load Sketchfab embeds. Nothing loads until a visitor asks for it.
-  document.querySelectorAll('.viewer[data-model]').forEach(function (v) {
-    var btn = v.querySelector('.poster');
-    if (!btn) return;
-    btn.addEventListener('click', function () {
-      var id = v.dataset.model;
-      var f = document.createElement('iframe');
-      f.title = v.dataset.title || '3D scan';
-      f.allow = 'autoplay; fullscreen; xr-spatial-tracking';
-      f.setAttribute('allowfullscreen', '');
-      f.src = 'https://sketchfab.com/models/' + id + '/embed?autostart=1&ui_theme=dark&ui_infos=0&ui_watermark=0&ui_watermark_link=0&preload=1';
-      v.appendChild(f);
-      v.classList.add('is-loaded');
+  // Models load automatically. The hero loads immediately; grid models load as
+  // they scroll into view. After each model is ready the camera is pulled back
+  // so the model sits with padding on all sides regardless of its saved view.
+  var PADDING = 1.35;   // >1 zooms out. 1.35 ≈ a third more distance than Sketchfab's default framing.
+
+  function initViewer(v) {
+    if (v.dataset.started) return;
+    v.dataset.started = '1';
+    var iframe = v.querySelector('iframe');
+    var client = new Sketchfab('1.12.1', iframe);
+    client.init(v.dataset.model, {
+      autostart: 1, preload: 1, camera: 0, transparent: 0,
+      ui_infos: 0, ui_watermark: 0, ui_watermark_link: 0, ui_hint: 0,
+      ui_annotations: 0, ui_stop: 0, ui_help: 0, ui_settings: 0, ui_vr: 0, ui_ar: 0,
+      success: function (api) {
+        api.start();
+        api.addEventListener('viewerready', function () {
+          api.getCameraLookAt(function (err, cam) {
+            if (err) { v.classList.add('is-ready'); return; }
+            var p = cam.position, t = cam.target;
+            var np = [ t[0] + (p[0]-t[0]) * PADDING, t[1] + (p[1]-t[1]) * PADDING, t[2] + (p[2]-t[2]) * PADDING ];
+            api.setCameraLookAt(np, t, 0, function () { v.classList.add('is-ready'); });
+          });
+        });
+      },
+      error: function () { v.classList.add('is-ready'); }
     });
-  });
+  }
+
+  var viewers = document.querySelectorAll('.viewer[data-model]');
+  viewers.forEach(function (v) { if ('eager' in v.dataset) initViewer(v); });
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { initViewer(e.target); io.unobserve(e.target); } });
+    }, { rootMargin: '300px 0px' });
+    viewers.forEach(function (v) { if (!('eager' in v.dataset)) io.observe(v); });
+  } else {
+    viewers.forEach(initViewer);
+  }
 </script>
 </body>
 </html>
